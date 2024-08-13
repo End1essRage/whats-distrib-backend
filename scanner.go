@@ -27,7 +27,6 @@ func NewExcelScanner(c map[int]string) *ExcelScanner {
 }
 
 func (s *ExcelScanner) Scan(filePath string) error {
-
 	result := make([]string, 0)
 
 	// Преобразуем
@@ -55,7 +54,6 @@ func (s *ExcelScanner) Scan(filePath string) error {
 
 	for id, row := range rows {
 		if id > 0 { // Начинаем со второй строки
-
 			sb := strings.Builder{}
 			for i := 0; i < len(s.Columns); i++ {
 				cellRef := fmt.Sprintf("%s%d", string('A'+i), id+1) // Определяем ссылку на ячейку
@@ -84,7 +82,6 @@ func (s *ExcelScanner) Scan(filePath string) error {
 	s.result = result
 
 	return nil
-
 }
 
 func (s *ExcelScanner) GetResult() [][]string {

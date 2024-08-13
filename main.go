@@ -18,16 +18,8 @@ func main() {
 		logrus.Error("error while reading environment %s", err.Error())
 	}
 
-	//настраиваем сканер
-
-	cells := make(map[int]string)
-	cells[0] = "Name"
-	cells[1] = "PhoneNumber"
-	cells[3] = "status"
-
-	scanner := NewExcelScanner(cells)
 	client := NewWClient()
-	service := NewTestService(scanner, client)
+	service := NewTestService(client)
 	api := NewApi(service)
 
 	api.gin.Run(viper.GetString("host"))

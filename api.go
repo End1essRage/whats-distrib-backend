@@ -29,7 +29,7 @@ func (a *Api) initRoutes() {
 	})
 
 	a.gin.POST("/upload", a.uploadFile)
-	a.gin.POST("/clear", a.clearUploaded)
+	a.gin.POST("/clear", a.clear)
 }
 
 func (a *Api) uploadFile(c *gin.Context) {
@@ -45,15 +45,18 @@ func (a *Api) uploadFile(c *gin.Context) {
 	}
 
 	//smth
-	a.service.HandleScanRequest(name)
+	go a.service.HandleScanRequest(name)
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
 
-func (a *Api) clearUploaded(c *gin.Context) {
+func (a *Api) clear(c *gin.Context) {
 	logrus.Info("hitted clear uploaded")
 
 	if err := os.RemoveAll("uploaded"); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+	}
+	if err := os.RemoveAll("jsons"); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 	}
 
