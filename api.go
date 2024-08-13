@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -28,6 +29,7 @@ func (a *Api) initRoutes() {
 	})
 
 	a.gin.POST("/upload", a.uploadFile)
+	a.gin.POST("/clear", a.clearUploaded)
 }
 
 func (a *Api) uploadFile(c *gin.Context) {
@@ -36,13 +38,24 @@ func (a *Api) uploadFile(c *gin.Context) {
 	//taking
 	file, _ := c.FormFile("file")
 
+	name := GenerateFileName(file.Filename)
 	//saving
-	if err := c.SaveUploadedFile(file, "uploaded/"+file.Filename); err != nil {
+	if err := c.SaveUploadedFile(file, "uploaded/"+name); err != nil {
 		logrus.Error("error while saving file : " + err.Error())
 	}
 
 	//smth
-	a.service.HandleScanRequest(file.Filename)
+	a.service.HandleScanRequest(name)
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+}
+
+func (a *Api) clearUploaded(c *gin.Context) {
+	logrus.Info("hitted clear uploaded")
+
+	if err := os.RemoveAll("uploaded"); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+	}
+
+	c.String(http.StatusOK, "removed")
 }
