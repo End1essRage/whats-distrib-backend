@@ -42,7 +42,7 @@ func (a *Api) uploadFile(c *gin.Context) {
 	}
 
 	//smth
-	a.service.HandleRequest()
+	a.service.HandleScanRequest(file.Filename)
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
