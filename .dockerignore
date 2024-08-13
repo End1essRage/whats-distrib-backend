@@ -1,0 +1,11 @@
+#git
+.gitignore
+README.md
+
+#directories
+jsons
+refs
+uploaded
+endpoints
+
+Makefile
