@@ -23,6 +23,7 @@ func main() {
 	cells := make(map[int]string)
 	cells[0] = "Name"
 	cells[1] = "PhoneNumber"
+	cells[3] = "status"
 
 	scanner := NewExcelScanner(cells)
 	client := NewWClient()

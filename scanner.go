@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -26,9 +27,10 @@ func NewExcelScanner(c map[int]string) *ExcelScanner {
 }
 
 func (s *ExcelScanner) Scan(filePath string) error {
+
 	result := make([]string, 0)
 
-	//преобразовываем
+	// Преобразуем
 	file, err := excelize.OpenFile(filePath)
 	if err != nil {
 		logrus.Error(err)
@@ -36,7 +38,7 @@ func (s *ExcelScanner) Scan(filePath string) error {
 	}
 
 	defer func() {
-		// Close the spreadsheet.
+		// Закрываем таблицу
 		if err := file.Close(); err != nil {
 			logrus.Error(err)
 		}
@@ -44,17 +46,37 @@ func (s *ExcelScanner) Scan(filePath string) error {
 
 	rows, err := file.GetRows(viper.GetString("sheet_name"))
 	if err != nil {
-		logrus.Error("cant get rows")
+		logrus.Error("can't get rows")
 		return err
 	}
 
+	// Создаем хранение значений ячеек с указанием их адресов
+	filledCells := make(map[string]string)
+
 	for id, row := range rows {
-		if id > 0 {
+		if id > 0 { // Начинаем со второй строки
+
 			sb := strings.Builder{}
-			for i, _ := range s.Columns {
-				sb.WriteString(row[i] + "|")
+			for i := 0; i < len(s.Columns); i++ {
+				cellRef := fmt.Sprintf("%s%d", string('A'+i), id+1) // Определяем ссылку на ячейку
+
+				// Проверяем, есть ли значение в строке или нет
+				var cellValue string
+				if i < len(row) {
+					cellValue = row[i]
+				}
+
+				// Заполняем мапу значением (пустая ячейка сохраняется как пустая строка)
+				filledCells[cellRef] = cellValue
+
+				// Добавляем значение в строку
+				if cellValue != "" {
+					sb.WriteString(cellValue + "|")
+				} else {
+					sb.WriteString("EMPTY|") // Если ячейка пустая
+				}
 			}
-			logrus.Info(sb.String())
+
 			result = append(result, sb.String())
 		}
 	}
@@ -62,6 +84,7 @@ func (s *ExcelScanner) Scan(filePath string) error {
 	s.result = result
 
 	return nil
+
 }
 
 func (s *ExcelScanner) GetResult() [][]string {
