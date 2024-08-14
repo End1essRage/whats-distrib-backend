@@ -9,9 +9,9 @@ RUN go mod download
 COPY . .
 
 # Собираем приложение
-RUN go build -o /app/whats-mass-ditrib ./.
+RUN go build -o /app/whats-distrib-backend ./.
 
 # Запускаем приложение при запуске контейнера
-CMD ["./whats-mass-ditrib"]
+CMD ["./whats-distrib-backend"]
 
 EXPOSE 8080

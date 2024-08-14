@@ -1,4 +1,4 @@
-module github.com/end1essrage/whats-mass-distrib
+module github.com/end1essrage/whats-distrib-backend
 
 go 1.22.5
 
@@ -52,7 +52,6 @@ require (
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
