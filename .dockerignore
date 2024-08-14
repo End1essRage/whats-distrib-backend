@@ -8,4 +8,6 @@ refs
 uploaded
 endpoints
 
+configs/config.local.yml
+
 Makefile

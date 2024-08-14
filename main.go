@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -9,13 +11,16 @@ import (
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("error while reading config %s", err.Error())
+	if _, err := os.Stat(".env"); err == nil {
+		err = godotenv.Load()
+		if err != nil {
+			logrus.Fatalf("error while reading environment %s", err.Error())
+		}
+
 	}
 
-	if err := godotenv.Load(); err != nil {
-		//non fatal
-		logrus.Error("error while reading environment %s", err.Error())
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error while reading config %s", err.Error())
 	}
 
 	client := NewWClient()
@@ -29,6 +34,10 @@ func main() {
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
+	//базовый
 	viper.SetConfigName("config")
-	return viper.ReadInConfig()
+	viper.ReadInConfig()
+	// из окружения
+	viper.SetConfigName("config." + os.Getenv("ENV"))
+	return viper.MergeInConfig()
 }
