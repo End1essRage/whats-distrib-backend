@@ -3,6 +3,7 @@ module github.com/end1essrage/whats-distrib-backend
 go 1.22.5
 
 require (
+	github.com/end1essrage/xslxmerge v0.1.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
 	github.com/sirupsen/logrus v1.9.3

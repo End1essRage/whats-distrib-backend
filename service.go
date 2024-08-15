@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/end1essrage/xslxmerge"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type Service interface {
@@ -19,28 +21,34 @@ func NewTestService(c Client) *TestService {
 
 func (s *TestService) HandleScanRequest(fileName string) error {
 	//настраиваем сканер
-	cells := make(map[int]string)
-	cells[0] = "Name"
-	cells[1] = "PhoneNumber"
-
-	scanner := NewExcelScanner(cells)
-
 	logrus.Info("Handling in service")
 
-	logrus.Info("Начало сканирования")
-	scanner.Scan("uploaded/" + fileName)
+	f := xslxmerge.NewReadFascade("uploaded/"+fileName, viper.GetString("sheet_name"))
+	command, err := f.NewReadFull()
+	if err != nil {
+		logrus.Error(err)
+	}
 
-	logrus.Info("получение результата")
-	result := scanner.GetResult()
+	rows, err := command.ReadRowsSync()
+	if err != nil {
+		logrus.Error(err)
+	}
 
-	logrus.Info("Сериализация результата")
+	columns, err := xslxmerge.GetAllHeaders("uploaded/"+fileName, viper.GetString("sheet_name"))
+	if err != nil {
+		logrus.Error(err)
+	}
+
 	data := make([]Track, 0)
-	for id, res := range result {
-		tr := Track{ID: id}
-		for i, val := range res {
-			row := Data{Column: scanner.Columns[i], Value: val}
-			tr.Data = append(tr.Data, row)
+
+	for _, row := range rows {
+		tr := Track{ID: row.Id}
+
+		for _, cell := range row.Data {
+			rd := Data{Column: columns[cell.ColumnId].Data, Value: cell.Data}
+			tr.Data = append(tr.Data, rd)
 		}
+
 		data = append(data, tr)
 	}
 
